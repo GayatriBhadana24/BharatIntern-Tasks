@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>Blog Website</title>
+</head>
+<body>
+    <header>
+        <h1>My Blog</h1>
+    </header>
+    <section id="blog-posts">
+        <!-- Blog posts will be dynamically loaded here -->
+    </section>
+    <footer>
+        <p>&copy; 2023 My Blog</p>
+    </footer>
+    <script src="/js/main.js"></script>
+</body>
+</html>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 1em;
+}
+
+section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+footer {
+    text-align: center;
+    padding: 1em;
+    background-color: #333;
+    color: #fff;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+</style>
+
+document.addEventListener('DOMContentLoaded', () => {
+    const blogPostsSection = document.getElementById('blog-posts');
+
+    // Fetch blog posts from server
+    fetch('/posts')
+        .then(response => response.json())
+        .then(posts => {
+            // Display each blog post
+            posts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.classList.add('blog-post');
+                postElement.innerHTML = `<h2>${post.title}</h2><p>${post.content}</p>`;
+                blogPostsSection.appendChild(postElement);
+            });
+        });
+});
+
+const express = require('express');
+const app = express();
+const mongoose = require('mongoose');
+const postRoutes = require('./routes/postRoutes');
+
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost/blog-website', { useNewUrlParser: true, useUnifiedTopology: true });
+
+// Middleware
+app.use(express.static('public'));
+app.use(express.json());
+
+// Routes
+app.use('/posts', postRoutes);
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
+

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>Money Tracker</title>
+</head>
+<body>
+    <header>
+        <h1>Money Tracker</h1>
+    </header>
+    <section id="transaction-list">
+        <!-- Transaction list will be dynamically loaded here -->
+    </section>
+    <section id="transaction-form">
+        <!-- Transaction form will be dynamically loaded here -->
+    </section>
+    <script src="/js/main.js"></script>
+</body>
+</html>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 1em;
+}
+
+section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+}
+
+label {
+    margin-bottom: 8px;
+}
+
+input {
+    padding: 8px;
+    margin-bottom: 16px;
+}
+
+button {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #555;
+}
+</style>
+
+document.addEventListener('DOMContentLoaded', () => {
+    const transactionListSection = document.getElementById('transaction-list');
+    const transactionFormSection = document.getElementById('transaction-form');
+
+    // Fetch transactions from server and display
+    fetch('/transactions')
+        .then(response => response.json())
+        .then(transactions => {
+            // Display each transaction
+            transactions.forEach(transaction => {
+                const transactionElement = document.createElement('div');
+                transactionElement.classList.add('transaction');
+                transactionElement.innerHTML = `<p>${transaction.description}: $${transaction.amount}</p>`;
+                transactionListSection.appendChild(transactionElement);
+            });
+        });
+
+    // Display transaction form
+    transactionFormSection.innerHTML = `
+        <h2>Add Transaction</h2>
+        <form id="transaction-form">
+            <label for="description">Description:</label>
+            <input type="text" id="description" name="description" required>
+            <label for="amount">Amount ($):</label>
+            <input type="number" id="amount" name="amount" required>
+            <button type="button" onclick="addTransaction()">Add Transaction</button>
+        </form>
+    `;
+});
+
+// Function to add a new transaction
+function addTransaction() {
+    const description = document.getElementById('description').value;
+    const amount = document.getElementById('amount').value;
+
+    // Send a POST request to add the transaction
+    fetch('/transactions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            description: description,
+            amount: amount,
+        }),
+    })
+    .then(response => response.json())
+    .then(() => {
+        // Refresh the page or update the transaction list
+        console.log('Transaction added successfully!');
+    });
+}
+
+const express = require('express');
+const app = express();
+const mongoose = require('mongoose');
+const transactionRoutes = require('./routes/transactionRoutes');
+
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost/money-tracker', { useNewUrlParser: true, useUnifiedTopology: true });
+
+// Middleware
+app.use(express.static('public'));
+app.use(express.json());
+
+// Routes
+app.use('/transactions', transactionRoutes);
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});

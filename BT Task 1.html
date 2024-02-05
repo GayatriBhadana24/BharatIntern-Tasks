@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>Registration Form</title>
+</head>
+<body>
+    <header>
+        <h1>Registration Form</h1>
+    </header>
+    <section id="registration-form">
+        <!-- Registration form will be dynamically loaded here -->
+    </section>
+    <script src="/js/main.js"></script>
+</body>
+</html>
+<style>
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 1em;
+}
+
+section {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 8px;
+}
+
+input {
+    padding: 8px;
+    margin-bottom: 16px;
+}
+
+button {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #555;
+}
+</style>
+document.addEventListener('DOMContentLoaded', () => {
+    const registrationFormSection = document.getElementById('registration-form');
+
+    // Display registration form
+    registrationFormSection.innerHTML = `
+        <h2>Register</h2>
+        <form id="registration-form">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <button type="button" onclick="registerUser()">Register</button>
+        </form>
+    `;
+});
+
+// Function to register a new user
+function registerUser() {
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    // Send a POST request to register the user
+    fetch('/users/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            username: username,
+            email: email,
+            password: password,
+        }),
+    })
+    .then(response => response.json())
+    .then(() => {
+        // Redirect or display a success message as needed
+        console.log('User registered successfully!');
+    });
+}
+
+const express = require('express');
+const app = express();
+const mongoose = require('mongoose');
+const userRoutes = require('./routes/userRoutes');
+
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost/registration-form', { useNewUrlParser: true, useUnifiedTopology: true });
+
+// Middleware
+app.use(express.static('public'));
+app.use(express.json());
+
+// Routes
+app.use('/users', userRoutes);
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is
+
+
+
